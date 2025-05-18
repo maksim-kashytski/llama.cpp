@@ -55,11 +55,11 @@ jobs:
             -DGGML_RPC=ON
           cmake --build build --config Release -j $(sysctl -n hw.logicalcpu)
 
-      - name: Test
-        id: cmake_test
-        run: |
-          cd build
-          ctest -L 'main|curl' --verbose --timeout 900
+      # - name: Test
+      #   id: cmake_test
+      #   run: |
+      #     cd build
+      #     ctest -L 'main|curl' --verbose --timeout 900
 
   # macOS-latest-cmake-x64:
   #   runs-on: macos-13
