@@ -1,4 +1,4 @@
-name: Create Release
+name: Release
 
 on:
   workflow_dispatch: # allows manual triggering
@@ -146,9 +146,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Determine tag name
-        id: tag
-        uses: ./.github/actions/get-tag-name
+      - name: Determine next tag
+        id: next_tag
+        run: |
+          # Получаем все теги вида vN
+          tags=$(git tag -l 'v[0-9]*' | sed 's/v//' | sort -n)
+          if [ -z "$tags" ]; then
+            next=1
+          else
+            last=$(echo "$tags" | tail -n 1)
+            next=$((last + 1))
+          fi
+          echo "v$next" > next_tag.txt
+          echo "name=v$next" >> $GITHUB_OUTPUT
 
       - name: Download artifacts
         id: download-artifact
@@ -166,7 +176,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.tag.outputs.name }}
+          tag_name: ${{ steps.next_tag.outputs.name }}
 
       - name: Upload release
         id: upload_release
